@@ -1,0 +1,12 @@
+{
+  "name": "my-monorepo",
+  "private": true,
+  "scripts": {
+    "dev:api": "npm run dev --prefix api",
+    "dev:app": "npm run dev --prefix app",
+    "dev": "concurrently \"npm run dev:api\" \"npm run dev:app\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
