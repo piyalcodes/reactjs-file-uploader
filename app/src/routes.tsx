@@ -1,6 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
-import { FileListPage } from "./features/file-list/pages/file-list";
-import { GeneralLayout } from "./layouts/general";
+
+import { FileUpload } from "@/features/file-upload/pages/file-upload";
+import { FileListPage } from "@/features/file-list/pages/file-list";
+import { GeneralLayout } from "@/layouts/general";
 
 const router = createBrowserRouter([
   {
@@ -9,6 +11,10 @@ const router = createBrowserRouter([
       {
         path: "/",
         element: <FileListPage />,
+      },
+      {
+        path: "/upload",
+        element: <FileUpload />,
       },
     ],
   },

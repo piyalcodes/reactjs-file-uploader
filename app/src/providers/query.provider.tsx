@@ -1,9 +1,11 @@
+
+import { type ReactNode, useState } from "react";
+
 import {
   QueryCache,
   QueryClient,
   QueryClientProvider,
 } from "@tanstack/react-query";
-import { type ReactNode, useState } from "react";
 
 export const QueryProvider = ({ children }: { children: ReactNode }) => {
   const [queryClient] = useState(
@@ -18,7 +20,7 @@ export const QueryProvider = ({ children }: { children: ReactNode }) => {
           },
         },
         queryCache: new QueryCache({
-          onError: (_error) => {},
+          onError: () => {},
         }),
       }),
   );

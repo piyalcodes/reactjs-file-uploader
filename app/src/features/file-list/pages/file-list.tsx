@@ -1,72 +1,42 @@
-import React, { useState, useEffect } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { Button } from "primereact/button";
-import { Rating } from "primereact/rating";
-import { Tag } from "primereact/tag";
+import { Badge } from "primereact/badge";
 
-type Files = {
-  id: string;
-  code: string;
-  name: string;
-  description: string;
-  image: string;
-  price: number;
-  category: string;
-  quantity: number;
-  inventoryStatus: string;
-  rating: number;
-};
+import type { FileItem } from "@/features/file-upload/types/types";
+import { useFileListSSE } from "@/features/file-list/hooks/useFileListEvent";
 
 export function FileListPage() {
-  const [products, setProducts] = useState([]);
-  const data = [
-    {
-      id: "1000",
-      code: "f230fh0g3",
-      name: "Bamboo Watch",
-      description: "Product Description",
-      image: "bamboo-watch.jpg",
-      price: 65,
-      category: "Accessories",
-      quantity: 24,
-      inventoryStatus: "INSTOCK",
-      rating: 5,
-    },
-    {
-      id: "10001",
-      code: "f230fh0g3",
-      name: "Bamboo Watch",
-      description: "Product Description",
-      image: "bamboo-watch.jpg",
-      price: 65,
-      category: "Accessories",
-      quantity: 24,
-      inventoryStatus: "INSTOCK",
-      rating: 5,
-    },
-  ];
+  const { files: products } = useFileListSSE();
 
-  useEffect(() => {
-    //ProductService.getProductsMini().then((data) => setProducts(data));
-  }, []);
-
-  const fileDetails = () => {
-    return <div>sdsdsds</div>;
+  const fileSize = (value: FileItem) => {
+    const size = value && value.size ? Math.round(value.size / 1024) : 0;
+    return <div>{size} Mb</div>;
   };
 
-  const footer = `In total there are ${products ? products.length : 0} products.`;
+  const fileType = (value: FileItem) => {
+    return <div>{value.mime_type}</div>;
+  };
+
+  const statusDetails = (value: FileItem) => {
+    return (
+      <div>
+        {" "}
+        <Badge value={value.status}></Badge>
+      </div>
+    );
+  };
 
   return (
     <div className="card">
       <DataTable
         value={products}
-        footer={footer}
+        footer={`In total there are ${products ? products.length : 0} files.`}
         tableStyle={{ minWidth: "60rem" }}
       >
-        <Column field="name" header="Name"></Column>
-        <Column header="Details" body={fileDetails}></Column>
-        <Column header="Status" body={fileDetails}></Column>
+        <Column field="filename" header="Name"></Column>
+        <Column field="mime_type" header="Type" body={fileType}></Column>
+        <Column header="Size" field="size" body={fileSize}></Column>
+        <Column header="Status" field="status" body={statusDetails}></Column>
       </DataTable>
     </div>
   );
