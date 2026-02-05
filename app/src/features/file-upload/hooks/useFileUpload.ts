@@ -11,7 +11,6 @@ export function useFileUpload(
   onProgressUpdate: (id: string, progress: number, status?: FileStatus) => void,
 ) {
 
-  
   const mutation = useMutation({
     mutationKey: ["file-upload"],
     mutationFn: async (fileItem: FileItem) => {
