@@ -1,4 +1,5 @@
 import { api } from "@/services/api";
+import type { PreSignUrlType } from "@/features/file-upload/types/types";
 
 export const FileUploadService = {
   uploadFile: async (
@@ -14,5 +15,12 @@ export const FileUploadService = {
         onProgress?.(percent);
       },
     });
+  },
+  payloadUpload: async (params: unknown): Promise<void> => {
+    return await api.post<void>("complete", params);
+  },
+
+  preSignUrlGenerator: async (): Promise<PreSignUrlType> => {
+    return await api.get<PreSignUrlType>("imagekit/auth");
   },
 };

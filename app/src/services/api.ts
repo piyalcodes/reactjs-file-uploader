@@ -7,6 +7,9 @@ const apiClient: AxiosInstance = axios.create({
 });
 
 export const api = {
+  get: <T = unknown>(url: string, config?: AxiosRequestConfig): Promise<T> => {
+    return apiClient.get(url, config).then((response) => response.data);
+  },
 
   post: <T = unknown>(
     url: string,

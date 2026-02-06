@@ -10,8 +10,13 @@ import {
   FILE_STATUSES,
   type FileItem,
   type FileStatus,
+  type ImageKitResponse,
 } from "@/features/file-upload/types/types";
-import { useFileUpload } from "@/features/file-upload/hooks/useFileUpload";
+import { fileUpload } from "@/features/file-upload/components/file-upload";
+import {
+  useUploadCompleted,
+  usePresignUrlEffect,
+} from "@/features/file-upload/hooks";
 
 import "primereact/resources/themes/lara-light-cyan/theme.css";
 
@@ -20,6 +25,11 @@ export function FileUpload() {
   const [uploadStarted, setUploadStarted] = useState(false);
 
   const navigate = useNavigate();
+
+  const { data: presignUrl } = usePresignUrlEffect(uploadStarted);
+
+  const { upload } = fileUpload();
+  const uploadCompleteMutation = useUploadCompleted();
 
   const updateProgress = (
     id: string,
@@ -39,8 +49,6 @@ export function FileUpload() {
     );
   };
 
-  const { mutateAsync } = useFileUpload(updateProgress);
-
   async function handleUpload(event: FileUploadHandlerEvent) {
     const newFileItems: FileItem[] = event.files.map((file) => ({
       file,
@@ -52,7 +60,21 @@ export function FileUpload() {
 
     setUploadStarted(true);
 
-    await Promise.all(newFileItems.map((f) => mutateAsync(f)));
+    if (presignUrl) {
+      await Promise.all(
+        newFileItems.map(async (f) => {
+          const result: ImageKitResponse | undefined = await upload(
+            f,
+            updateProgress,
+            presignUrl,
+          );
+
+          if (result) {
+            await uploadCompleteMutation.mutateAsync(result);
+          }
+        }),
+      );
+    }
 
     setTimeout(() => {
       navigate("/");
