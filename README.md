@@ -1,3 +1,11 @@
+![React Application Architecture](../docs/c4-model.jpg)
+
+# Architectaral docuemnts
+
+[Architecture Decision Record (ADR)](https://docs.google.com/document/d/1MHshtdQwIIn2zC7x8wXjJPXI88ytCzL-/edit?usp=drive_link&ouid=116849936694237059139&rtpof=true&sd=true)
+
+[Product Requirements Document (PRD)](https://docs.google.com/document/d/1ZrpHoVidzimEG6Uwq0LS0euXxX4ZZ8zn/edit?usp=drive_link&ouid=116849936694237059139&rtpof=true&sd=true)
+
 # My Monorepo Project
 
 This repository contains a full-stack project with a **Hono backend** and a **React frontend**. Both apps can be run independently or together via a single command.
