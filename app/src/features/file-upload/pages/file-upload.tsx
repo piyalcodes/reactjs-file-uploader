@@ -1,63 +1,11 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import {
-  type FileUploadHandlerEvent,
-  FileUpload as FileUploader,
-} from "primereact/fileupload";
+import { FileUpload as FileUploader } from "primereact/fileupload";
 import { ProgressBar } from "primereact/progressbar";
 
-import {
-  FILE_STATUSES,
-  type FileItem,
-  type FileStatus,
-} from "@/features/file-upload/types/types";
-import { useFileUpload } from "@/features/file-upload/hooks/useFileUpload";
-
 import "primereact/resources/themes/lara-light-cyan/theme.css";
+import { useFileUploadHandler } from "@/features/file-upload/hooks/useFileUpload";
 
 export function FileUpload() {
-  const [files, setFiles] = useState<FileItem[]>([]);
-  const [uploadStarted, setUploadStarted] = useState(false);
-
-  const navigate = useNavigate();
-
-  const updateProgress = (
-    id: string,
-    progress: number,
-    status?: FileStatus,
-  ) => {
-    setFiles((prev) =>
-      prev.map((f) =>
-        f.id === id
-          ? {
-              ...f,
-              progress,
-              status: status ?? f.status,
-            }
-          : f,
-      ),
-    );
-  };
-
-  const { mutateAsync } = useFileUpload(updateProgress);
-
-  async function handleUpload(event: FileUploadHandlerEvent) {
-    const newFileItems: FileItem[] = event.files.map((file) => ({
-      file,
-      status: FILE_STATUSES.UPLOADING,
-      progress: 0,
-      id: crypto.randomUUID(),
-    }));
-    setFiles((prev) => [...prev, ...newFileItems]);
-
-    setUploadStarted(true);
-
-    await Promise.all(newFileItems.map((f) => mutateAsync(f)));
-
-    setTimeout(() => {
-      navigate("/");
-    }, 1000);
-  }
+  const { files, uploadStarted, handleUpload } = useFileUploadHandler();
 
   return (
     <div style={{ width: "100%" }}>

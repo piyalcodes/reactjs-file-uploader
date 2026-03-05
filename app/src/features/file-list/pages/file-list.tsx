@@ -6,7 +6,7 @@ import type { FileItem } from "@/features/file-upload/types/types";
 import { useFileListSSE } from "@/features/file-list/hooks/useFileListEvent";
 
 export function FileListPage() {
-  const { files: products } = useFileListSSE();
+  const { files } = useFileListSSE();
 
   const fileSize = (value: FileItem) => {
     const size = value && value.size ? Math.round(value.size / 1024) : 0;
@@ -29,8 +29,8 @@ export function FileListPage() {
   return (
     <div className="card">
       <DataTable
-        value={products}
-        footer={`In total there are ${products ? products.length : 0} files.`}
+        value={files}
+        footer={`In total there are ${files ? files.length : 0} files.`}
         tableStyle={{ minWidth: "60rem" }}
       >
         <Column field="filename" header="Name"></Column>

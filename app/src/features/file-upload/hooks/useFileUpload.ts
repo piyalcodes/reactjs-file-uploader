@@ -1,50 +1,74 @@
-import { useMutation } from "@tanstack/react-query";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import type { FileUploadHandlerEvent } from "primereact/fileupload";
 
 import {
   FILE_STATUSES,
   type FileItem,
   type FileStatus,
+  type ImageKitResponse,
 } from "@/features/file-upload/types/types";
-import { FileUploadService } from "@/features/file-upload/services/file-upload.service";
 
-export function useFileUpload(
-  onProgressUpdate: (id: string, progress: number, status?: FileStatus) => void,
-) {
+import { useUploadCompleted } from "@/features/file-upload/hooks";
+import { usePreSignUrlGenerator } from "@/features/file-upload/hooks/usePreSignUrlGenerator";
+import { FileListService } from "@/features/file-list/services/file-list.services";
 
-  
-  const mutation = useMutation({
-    mutationKey: ["file-upload"],
-    mutationFn: async (fileItem: FileItem) => {
-      setTimeout(() => {
-        onProgressUpdate(fileItem.id, 0, FILE_STATUSES.UPLOADED);
-      }, 100);
+export function useFileUploadHandler() {
+  const [files, setFiles] = useState<FileItem[]>([]);
+  const [uploadStarted, setUploadStarted] = useState(false);
 
-      setTimeout(async () => {
-        const formData = new FormData();
+  const navigate = useNavigate();
+  const { data: presignUrl } = usePreSignUrlGenerator();
+  const { upload } = FileListService.fileUpload();
+  const uploadCompleteMutation = useUploadCompleted();
 
-        formData.append("file", fileItem.file);
+  const updateProgress = (
+    id: string,
+    progress: number,
+    status?: FileStatus,
+  ) => {
+    setFiles((prev) =>
+      prev.map((f) =>
+        f.id === id ? { ...f, progress, status: status ?? f.status } : f,
+      ),
+    );
+  };
 
-        await FileUploadService.uploadFile(
-          formData,
-          "/upload",
-          (percent: number) => {
-            onProgressUpdate(fileItem.id, percent, FILE_STATUSES.UPLOADING);
-          },
-        );
-      }, 200);
+  async function handleUpload(event: FileUploadHandlerEvent) {
+    const newFileItems: FileItem[] = event.files.map((file) => ({
+      file,
+      status: FILE_STATUSES.UPLOADING,
+      progress: 0,
+      id: crypto.randomUUID(),
+    }));
 
-      setTimeout(() => {
-        onProgressUpdate(fileItem.id, 100, FILE_STATUSES.COMPLETED);
-      }, 500);
+    setFiles((prev) => [...prev, ...newFileItems]);
+    setUploadStarted(true);
 
-      setTimeout(() => {
-        return { id: fileItem.id, filename: fileItem.file.name };
-      }, 1000);
-    },
-    onError: (error) => {
-      console.error("Error uploading file:", error);
-    },
-  });
+    if (presignUrl) {
+      await Promise.all(
+        newFileItems.map(async (f) => {
+          const result: ImageKitResponse | undefined = await upload(
+            f,
+            updateProgress,
+            presignUrl,
+          );
 
-  return mutation;
+          if (result) {
+            await uploadCompleteMutation.mutateAsync(result);
+          }
+        }),
+      );
+    }
+
+    setTimeout(() => {
+      navigate("/");
+    }, 1000);
+  }
+
+  return {
+    files,
+    uploadStarted,
+    handleUpload,
+  };
 }

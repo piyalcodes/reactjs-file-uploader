@@ -16,4 +16,25 @@ export interface FileItem {
   id: string;
   size?: number;
   mime_type?: string;
+  name?: string;
+  fileId?: string;
+  url?: string;
+  fileType?: string;
 }
+
+export type PreSignUrlType = {
+  token: string;
+  signature: string;
+  expire: number;
+};
+
+export type ImageKitResponse = {
+  fileId: string;
+  filePath: string;
+  fileType: string;
+  name: string;
+  size: number;
+  url: string;
+  AITags?: object[];
+  description?: string;
+};
