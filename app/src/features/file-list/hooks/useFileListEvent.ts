@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { FileListServce } from "@/features/file-list/services/file-list.services";
+import { FileListService } from "@/features/file-list/services/file-list.services";
 import {
   FILE_STATUSES,
   type FileItem,
@@ -13,7 +13,7 @@ export function useFileListSSE() {
   const [status, setStatus] = useState<FileStatus>(FILE_STATUSES.PROCESSING);
 
   useEffect(() => {
-    const es = FileListServce.subscribeToFileList(
+    const es = FileListService.subscribeToFileList(
       "/events",
       (data: FileListSSE) => {
         setFiles(data.files);
