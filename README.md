@@ -1,4 +1,4 @@
-![React Application Architecture](../docs/c4-model.jpg)
+![React Application Architecture](docs/c4-model.jpg)
 
 # Architectaral docuemnts
 
